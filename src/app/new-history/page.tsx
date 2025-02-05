@@ -5,7 +5,7 @@ import "@/styles/new-history.css";
 
 export default function newHistory() {
   const [image, setImage] = useState<File | null>(null);
-  const { addNewHistory, loading } = useHistory();
+  const { addNewHistory, loading, msgError } = useHistory();
 
   const submitHistory = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,6 +20,7 @@ export default function newHistory() {
           Sube tu imagen a la historia
         </label>
         {loading && <strong className="title-loading">Subiendo imagen...</strong>}
+        {msgError && <strong className="title-error">{msgError}</strong>}
         <input
           type="file"
           accept="image/*"

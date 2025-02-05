@@ -11,12 +11,14 @@ import "@/styles/history.css";
 
 export default function History() {
   const [index, setIndex] = useState<number>(0);
+  const [progress, setProgress] = useState<number>(0);
   const { user, removeHistory } = useHistory();
   const router = useRouter();
 
   const nextSlide = () => {
     if (index < user.histories.length - 1) {
       setIndex((prevIndex) => prevIndex + 1);
+      setProgress(0);
     } else {
       router.push("/");
     }
@@ -27,6 +29,7 @@ export default function History() {
       router.push("/");
     } else {
       setIndex((prevIndex) => prevIndex - 1);
+      setProgress(0);
     }
   };
 
@@ -35,6 +38,19 @@ export default function History() {
     return () => clearInterval(interval);
   }, [index, user.histories.length]);
 
+  useEffect(() => {
+    const progressInterval = setInterval(() => {
+      setProgress((prevProgress) => {
+        if (prevProgress >= 100) {
+          return 0;
+        }
+        return prevProgress + 100 / (8000 / 50);
+      });
+    }, 50);
+
+    return () => clearInterval(progressInterval);
+  }, [index]);
+
   return user.histories.length > 0 ? (
     <section className="page-history">
       <div className="header-history">
@@ -42,7 +58,9 @@ export default function History() {
           <img src={iconBack.src} alt="return page" width={35} height={35} />
         </Link>
       </div>
-
+      <div className="progress-bar-container">
+        <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+      </div>
       <div className="container-controls">
         <img
           src={iconBack.src}

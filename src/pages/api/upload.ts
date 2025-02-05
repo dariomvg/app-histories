@@ -28,6 +28,6 @@ export default async function handler(
       url: imageUpload.secure_url,
     });
   } catch (error) {
-    res.status(400).json({ message: "Error al subir la imagen", error });
+    res.status(413).json({ message: "Error al subir la imagen", error });
   }
 }

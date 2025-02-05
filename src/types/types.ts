@@ -10,6 +10,7 @@ export interface UseHistory {
   logout: () => void;
   user: User;
   loading: boolean;
+  msgError: string;
 }
 
 export interface PropsCardHistory {

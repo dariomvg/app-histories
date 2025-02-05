@@ -11,12 +11,14 @@ const saveLocalStorage = (updateUser: User): void => {
 
 const handleUpdateUser = (
   prevUser: User,
-  publicId: string,
-  url: string
+  result: { publicId: string; url: string }
 ): User => {
   return {
     ...prevUser,
-    histories: [...prevUser.histories, { id: publicId, url }],
+    histories: [
+      ...prevUser.histories,
+      { id: result.publicId, url: result.url },
+    ],
   };
 };
 
@@ -30,6 +32,7 @@ const handleRemoveHistory = (prevUser: User, id: string): User => {
 export const useHistory = (): UseHistory => {
   const [user, setUser] = useState<User>(objUser);
   const [loading, setLoading] = useState<boolean>(false);
+  const [msgError, setMsgError] = useState<string>("");
   const router = useRouter();
 
   const addNewHistory = (image: File) => {
@@ -37,9 +40,15 @@ export const useHistory = (): UseHistory => {
     reader.readAsDataURL(image);
     reader.onloadend = async () => {
       setLoading(true);
-      const { publicId, url } = await uploadImage(reader);
+      const result = await uploadImage(reader);
+      if (!result) {
+        setMsgError("Tamaño de imagen excedido. 5mb máximo");
+        setLoading(false);
+        setTimeout(() => setMsgError(""), 5000);
+        return;
+      }
       setUser((prevUser) => {
-        const updateUser = handleUpdateUser(prevUser, publicId, url);
+        const updateUser = handleUpdateUser(prevUser, result);
         saveLocalStorage(updateUser);
         return updateUser;
       });
@@ -80,5 +89,13 @@ export const useHistory = (): UseHistory => {
     }
   }, []);
 
-  return { addNewHistory, removeHistory, register, logout, user, loading };
+  return {
+    addNewHistory,
+    removeHistory,
+    register,
+    logout,
+    user,
+    loading,
+    msgError,
+  };
 };
